@@ -54,6 +54,13 @@ uv run dev/run_dev_server.py --stub-providers claude
 The stubs are dev/CI-only; the `ui-review` bot always passes `--stub-providers claude`
 so the Assistant is reviewable on any PR.
 
+## Cursor Cloud specific instructions
+
+- On boot, `start` runs `uv run dev/run_dev_server.py --stub-providers claude`. Backend health is `http://127.0.0.1:5000/health` and the React UI is `http://127.0.0.1:3000`. The launcher prints both URLs and uses the next free port if 5000 or 3000 is taken.
+- Node 24 is installed at `/usr/local/lib/nodejs/bin` and prepended to `PATH`. `/exec-daemon/node` is Node 22 and does not satisfy `mlflow/server/js` `engines.node` (`^24.14.0`). `NODE_OPTIONS=--max-old-space-size=8192` is set because the webpack dev server exceeds Node's default heap.
+- Python commands go through the uv-managed 3.10 `.venv`. `uv run pytest tests/test_version.py` is a representative test. Flavor libraries in `requirements/extra-ml-requirements.txt` (TensorFlow, PyTorch, and similar) are not preinstalled.
+- `java` is OpenJDK 17, matching CI for Spark tests. Install initializes the `mlflow/assistant/skills` submodule.
+
 ## Debugging
 
 For debugging errors, enable debug logging (must be set before importing mlflow):
